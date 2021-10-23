@@ -58,12 +58,21 @@ namespace SR78POS.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,CategoryId,SaleUnit,ProductName,Barcode,Description,OnHand,Cost")] Product product)
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Product product)
         {
             if (ModelState.IsValid)
             {
-                product.ProductId = Guid.NewGuid();
+                var pid = Guid.NewGuid();
+                if(product.ProductPrices != null)
+                {
+                    for(int i = 0; i < product.ProductPrices.Count; i++)
+                    {
+                        product.ProductPrices[i].ProductId = pid;
+                        product.ProductPrices[i].ProductPriceId = Guid.NewGuid();
+                    }
+                }
+                product.ProductId = pid;
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
