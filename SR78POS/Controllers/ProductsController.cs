@@ -158,7 +158,8 @@ namespace SR78POS.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        public async Task<JsonResult> GetUnits()
+            => Json(await _context.Unit.ToListAsync());
         private bool ProductExists(Guid id)
         {
             return _context.Product.Any(e => e.ProductId == id);

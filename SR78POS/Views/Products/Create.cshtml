@@ -10,7 +10,6 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
@@ -46,9 +45,24 @@
                 <span asp-validation-for="Cost" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <button class="btn btn-primary">
+                    <i class="fa fa-save"></i> Save
+                </button>
             </div>
-        </form>
+    </div>
+    <div class="col-md-6">
+        <table class="table table-bordered" id="t1">
+            <thead>
+                <tr>
+                    <th style="width:250px">Unit</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        </table>
+        <button id="AddRow" class="btn btn-primary">
+            <i class="fa fa-plus"></i> Add
+        </button>
     </div>
 </div>
 
@@ -58,4 +72,30 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+    var options = "";
+    $(document).ready(function () {
+        $("#AddRow").click(function () {
+            var row = "<tr><td><select class='form-control' name='unit[]'>" + options + "</select></td>";
+            row += "<td><input class='form-control' name='price[]'/></td>";
+            row += "<td><button class='btn btn-danger'><i class='fa fa-trash'></i></button></td></tr>";
+            $("#t1").append(row);
+        });
+        $.ajax({
+            method: "GET",
+            contentType: "application/json",
+            url: "GetUnits",
+            success: function (v) {
+                console.log(v);
+                $.each(v, function (i, v1) {
+                    console.log(v1);
+                    options += "<option value='" + v1.unitId +"'>" + v1.unitName +"</option>";
+                });
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        });
+    });
+</script>
 }
