@@ -1,5 +1,4 @@
-﻿@model IEnumerable<SR78POS.Models.Product>
-
+﻿
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,63 +8,75 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table" id="t1">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ProductName)
+                Product Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Barcode)
+                Barcode
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+               Description
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OnHand)
+                OnHand
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Cost)
+               Cost
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+               Category
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Unit)
+                Unit
             </th>
+            <th></th>
+            <th></th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Barcode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OnHand)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cost)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Unit.UnitName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
-            </td>
-        </tr>
-}
     </tbody>
 </table>
+@section Scripts{ 
+    <script>
+        $(document).ready(function () {
+            $("#t1").DataTable({
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "ajax": {
+                "url": "Products/GetData",
+                "type": "POST",
+                "dataType": "json"
+            },
+                "columns": [
+                { "data": "productName", "name": "productName" },
+                { "data": "description", "name": "description" },
+                { "data": "onHand", "name": "onHand" },
+                { "data": "barcode", "name": "barcode" },
+                { "data": "cost", "name": "cost" },
+                { "data": "categoryId", "name": "categoryId" },
+                { "data": "saleUnit", "name": "saleUnit" },
+                {
+                    "render": function (data, type, full, meta) {
+                        return '<a class="btn btn-info" href="' + full.assignedID + '"><span class="fa fa-edit"></span></a>';
+                    }, orderable: false
+                },
+                {
+                    "render": function (data, type, full, meta) {
+                        return '<a class="btn btn-primary" href="AssignedGroups/print/' + full.assignedID + '"><span class="fa fa-print"></span></a>';
+                    }, orderable: false
+                },
+                {
+                    data: null, render: function (data, type, row) {
+                        return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.assignedID + "');><span class='fa fa-trash'></a>";
+                    }, orderable: false
+                }
+            ]
+            });
+        });
+    </script>
+}
