@@ -4,7 +4,7 @@
 }
 
 <h1>Index</h1>
-
+@Html.AntiForgeryToken()
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -34,7 +34,6 @@
             </th>
             <th></th>
             <th></th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -62,21 +61,34 @@
                 { "data": "saleUnit", "name": "saleUnit" },
                 {
                     "render": function (data, type, full, meta) {
-                        return '<a class="btn btn-info" href="' + full.assignedID + '"><span class="fa fa-edit"></span></a>';
-                    }, orderable: false
-                },
-                {
-                    "render": function (data, type, full, meta) {
-                        return '<a class="btn btn-primary" href="AssignedGroups/print/' + full.assignedID + '"><span class="fa fa-print"></span></a>';
+                        return '<a class="btn btn-info" href="products/edit/' + full.productId + '"><span class="fa fa-edit"></span></a>';
                     }, orderable: false
                 },
                 {
                     data: null, render: function (data, type, row) {
-                        return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.assignedID + "');><span class='fa fa-trash'></a>";
+                        return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.productId + "');><span class='fa fa-trash'></a>";
                     }, orderable: false
                 }
             ]
             });
         });
+        function DeleteData(id) {
+            if (confirm("Do you want to delete this record?")) {
+                 var url = "products/Delete/" + id;
+        var token = $("[name='__RequestVerificationToken']").val();
+        $.post(url, { ID: id, __RequestVerificationToken: token }, function (data)
+        {
+            if (data)
+            {
+                oTable = $('#t1').DataTable();
+                oTable.draw();
+            }
+            else
+            {
+                alert("Something Went Wrong!");
+            }
+        });
+            }
+        }
     </script>
 }
