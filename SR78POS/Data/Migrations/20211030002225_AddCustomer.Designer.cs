@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SR78POS.Data;
 
 namespace SR78POS.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211030002225_AddCustomer")]
+    partial class AddCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -327,75 +329,6 @@ namespace SR78POS.Data.Migrations
                     b.ToTable("ProductPrice");
                 });
 
-            modelBuilder.Entity("SR78POS.Models.Sale", b =>
-                {
-                    b.Property<Guid>("SaleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Discount")
-                        .HasColumnType("float");
-
-                    b.Property<double>("GrandTotal")
-                        .HasColumnType("float");
-
-                    b.Property<string>("InvoiceNumber")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<DateTime>("IssueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Total")
-                        .HasColumnType("float");
-
-                    b.HasKey("SaleId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Sale");
-                });
-
-            modelBuilder.Entity("SR78POS.Models.SaleDetail", b =>
-                {
-                    b.Property<Guid>("SaleDetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Amount")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Discount")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Qty")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SaleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Total")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("UnitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("UnitPrice")
-                        .HasColumnType("float");
-
-                    b.HasKey("SaleDetailId");
-
-                    b.HasIndex("SaleId");
-
-                    b.ToTable("SaleDetail");
-                });
-
             modelBuilder.Entity("SR78POS.Models.Unit", b =>
                 {
                     b.Property<Guid>("UnitId")
@@ -494,34 +427,9 @@ namespace SR78POS.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SR78POS.Models.Sale", b =>
-                {
-                    b.HasOne("SR78POS.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("SR78POS.Models.SaleDetail", b =>
-                {
-                    b.HasOne("SR78POS.Models.Sale", null)
-                        .WithMany("SaleDetails")
-                        .HasForeignKey("SaleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SR78POS.Models.Product", b =>
                 {
                     b.Navigation("ProductPrices");
-                });
-
-            modelBuilder.Entity("SR78POS.Models.Sale", b =>
-                {
-                    b.Navigation("SaleDetails");
                 });
 #pragma warning restore 612, 618
         }

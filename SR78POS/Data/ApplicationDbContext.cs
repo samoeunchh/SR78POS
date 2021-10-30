@@ -17,5 +17,8 @@ namespace SR78POS.Data
         public DbSet<Unit> Unit { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<ProductPrice> ProductPrice { get; set; }
+        public DbSet<Customer> Customer { get; set; }
+        public DbSet<Sale> Sale { get; set; }
+        public DbSet<SaleDetail> SaleDetail { get; set; }
     }
 }
