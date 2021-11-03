@@ -4,47 +4,85 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Sale</h4>
+<h4>Sale Product</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="form-group row">
                 <label asp-for="CustomerId" class="control-label"></label>
                 <select asp-for="CustomerId" class ="form-control" asp-items="ViewBag.CustomerId"></select>
             </div>
-            <div class="form-group">
-                <label asp-for="IssueDate" class="control-label"></label>
-                <input asp-for="IssueDate" class="form-control" />
-                <span asp-validation-for="IssueDate" class="text-danger"></span>
+        <div class="form-group row">
+            <input class="form-control" id="search" placeholder="Barcode..."/>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group row">
+            <label asp-for="IssueDate" class="control-label"></label>
+            <input asp-for="IssueDate" class="form-control" />
+            <span asp-validation-for="IssueDate" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <table class="table table-bordered" id="t1">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Unit</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Amount</th>
+                <th>Discount</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </div>
+    <div class="col-md-8">
+        <p class="text-right">
+            <div class="form-group row">
+                <label asp-for="Total" class="col-md-3 col-form-control"></label>
+                <div class="col-md-9">
+                    <input asp-for="Total" class="form-control" readonly />
+                    <span asp-validation-for="Total" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="InvoiceNumber" class="control-label"></label>
-                <input asp-for="InvoiceNumber" class="form-control" />
-                <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+            <div class="form-group row">
+                <label asp-for="Discount" class="col-md-3 col-form-control"></label>
+                <div class="col-md-9">
+                    <input asp-for="Discount" class="form-control" />
+                    <span asp-validation-for="Discount" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Total" class="control-label"></label>
-                <input asp-for="Total" class="form-control" />
-                <span asp-validation-for="Total" class="text-danger"></span>
+            <div class="form-group row">
+                <label asp-for="GrandTotal" class="col-md-3 col-form-control"></label>
+                <div class="col-md-9">
+                    <input asp-for="GrandTotal" class="form-control" readonly />
+                    <span asp-validation-for="GrandTotal" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Discount" class="control-label"></label>
-                <input asp-for="Discount" class="form-control" />
-                <span asp-validation-for="Discount" class="text-danger"></span>
+            <div class="form-group row">
+                <label for="Receive" class="col-md-3 col-form-control">Receive</label>
+                <div class="col-md-9">
+                    <input id="Receive" name="Receive" class="form-control" />
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="GrandTotal" class="control-label"></label>
-                <input asp-for="GrandTotal" class="form-control" />
-                <span asp-validation-for="GrandTotal" class="text-danger"></span>
+            <div class="form-group row">
+                <label for="Change" class="col-md-3 col-form-control">Change</label>
+                <div class="col-md-9">
+                    <input id="Change" name="Change" class="form-control" />
+                </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </p>
     </div>
 </div>
 
@@ -54,4 +92,25 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $("#search").keypress(function (e) {
+                if (e.keyCode === 13) {
+                    $.ajax({
+                        method: "GET",
+                        dataType: "JSON",
+                        url: "/api/Product/" + $("#search").val(),
+                        success: function (response) {
+                            var row = "<tr><td>"+ response.productName +"</td>";
+                            row += "<td><select class='form-control'></select></td>";
+                            row += "<td></td><td></td><td></td><td></td><td></td><td></td></tr>";
+                            $("#t1").append(row);
+                        }, error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 }
