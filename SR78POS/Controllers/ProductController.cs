@@ -4,6 +4,7 @@ using SR78POS.Data;
 using SR78POS.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SR78POS.Controllers
 {
@@ -25,8 +26,21 @@ namespace SR78POS.Controllers
 
         // GET api/<ProductController>/5
         [HttpGet("{code}")]
-        public async Task<Product> Get(string code)
-            =>await _context.Product.FirstOrDefaultAsync(x => x.Barcode.Equals(code));
+        public async Task<IActionResult> Get(string code)
+        {
+            var data = await (from p in _context.Product
+                        join pp in _context.ProductPrice on p.SaleUnit equals pp.UnitId
+                        where p.Barcode.Equals(code)
+                        select new
+                        {
+                            p.ProductName,
+                            p.ProductId,
+                            p.Barcode,
+                            pp.Price,
+                            p.SaleUnit
+                        }).FirstOrDefaultAsync();
+            return Ok(data);
+        }
 
         // POST api/<ProductController>
         [HttpPost]
