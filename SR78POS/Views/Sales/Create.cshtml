@@ -96,35 +96,53 @@
     <script>
         $(document).ready(function () {
             var i = 0;
+            var rec = false;
             $("#search").keypress(function (e) {
                 if (e.keyCode === 13) {
-                    $.ajax({
-                        method: "GET",
-                        dataType: "JSON",
-                        url: "/api/Product/" + $("#search").val(),
-                        success: function (response) {
-                            console.log(response);
-                            if (response) {
-                                var row = "<tr><td>" + response.productName + "</td>";
-                                row += "<td><select class='form-control' name='unit[]' id='unit"+ i +"'>" + options + "</select></td>";
-                                row += "<td>" + response.price + "</td>";
-                                row += "<td><input type='number' class='form-control qty' name='qty[]' value='1'/></td>";
-                                row += "<td>" + response.price + "</td>";
-                                row += "<td><input type='number' class='form-control discount' name='dis[]' value='0'/></td>";
-                                row += "<td>" + response.price + "</td>";
-                                row += "<td><button class='btn btn-danger'><i class='fa fa-trash'></i></td></tr>";
-                                $("#t1").append(row);
-                                $("#unit" + i + "").val(response.saleUnit);
-                                $("#search").val("");
-                                Calculation();
-                                i++;
-                            }
-                        }, error: function (error) {
-                            console.log(error);
+                    var a = 0;
+                    $('input[name="barcode[]"]').each(function () {
+                        if ($("#search").val() === $(this).val()) {
+                            rec = true;
+                            var qty = document.getElementsByName("qty[]")[a].value;
+                            document.getElementsByName("qty[]")[a].value = Number(qty) + 1;
+                            Calculation();
+                            $("#search").val("");
                         }
+                        a++;
                     });
+                    if (rec == false) {
+                        $.ajax({
+                            method: "GET",
+                            dataType: "JSON",
+                            url: "/api/Product/" + $("#search").val(),
+                            success: function (response) {
+                                console.log(response);
+                                if (response) {
+                                    var row = "<tr><td><input type='hidden' value='" + response.barcode + "' name='barcode[]' />" + response.productName + "</td>";
+                                    row += "<td><select class='form-control' name='unit[]' id='unit" + i + "'>" + options + "</select></td>";
+                                    row += "<td>" + response.price + "</td>";
+                                    row += "<td><input type='number' class='form-control qty' name='qty[]' value='1'/></td>";
+                                    row += "<td>" + response.price + "</td>";
+                                    row += "<td><input type='number' class='form-control discount' name='dis[]' value='0'/></td>";
+                                    row += "<td>" + response.price + "</td>";
+                                    row += "<td><button class='btn btn-danger remove'><i class='fa fa-trash'></i></td></tr>";
+                                    $("#t1").append(row);
+                                    $("#unit" + i + "").val(response.saleUnit);
+                                    $("#search").val("");
+                                    Calculation();
+                                    i++;
+                                }
+                            }, error: function (error) {
+                                console.log(error);
+                            }
+                        });
+                    }
                 }
             });
+        });
+        $(document).on("click", ".remove", function () {
+            $(this).closest("tr").remove();
+            Calculation();
         });
         $(document).on("blur", ".qty", function () {
             Calculation();
