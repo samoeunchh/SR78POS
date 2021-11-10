@@ -39,6 +39,7 @@
                 <th>Action</th>
             </tr>
         </thead>
+        <tbody></tbody>
     </table>
 </div>
 <div class="row">
@@ -95,7 +96,6 @@
     <script>
         $(document).ready(function () {
             var i = 0;
-            var total = 0;
             $("#search").keypress(function (e) {
                 if (e.keyCode === 13) {
                     $.ajax({
@@ -108,16 +108,15 @@
                                 var row = "<tr><td>" + response.productName + "</td>";
                                 row += "<td><select class='form-control' name='unit[]' id='unit"+ i +"'>" + options + "</select></td>";
                                 row += "<td>" + response.price + "</td>";
-                                row += "<td><input type='number' class='form-control' name='qty[]' value='1'/></td>";
+                                row += "<td><input type='number' class='form-control qty' name='qty[]' value='1'/></td>";
                                 row += "<td>" + response.price + "</td>";
-                                row += "<td><input type='number' class='form-control' name='dis[]' value='0'/></td>";
+                                row += "<td><input type='number' class='form-control discount' name='dis[]' value='0'/></td>";
                                 row += "<td>" + response.price + "</td>";
                                 row += "<td><button class='btn btn-danger'><i class='fa fa-trash'></i></td></tr>";
                                 $("#t1").append(row);
                                 $("#unit" + i + "").val(response.saleUnit);
-                                total += response.price;
-                                $("#Total").val(total);
-                                $("#GrandTotal").val(total);
+                                $("#search").val("");
+                                Calculation();
                                 i++;
                             }
                         }, error: function (error) {
@@ -127,5 +126,26 @@
                 }
             });
         });
+        $(document).on("blur", ".qty", function () {
+            Calculation();
+        });
+        $(document).on("blur", ".discount", function () {
+            Calculation();
+        });
+        function Calculation() {
+            var total = 0;
+            $("#t1 > tbody  > tr").each(function (i) {
+                var price = $(this).find("td:eq(2)").html();
+                var qty = document.getElementsByName("qty[]")[i].value;
+                var amount = Number(price) * Number(qty);
+                $(this).find("td:eq(4)").html(amount);
+                var discount = document.getElementsByName("dis[]")[i].value;
+                var disc = (amount * Number(discount)) / 100;
+                $(this).find("td:eq(6)").html(amount - disc);
+                total += (amount - disc);
+            });
+            $("#Total").val(total);
+            $("#GrandTotal").val(total);
+        }
     </script>
 }
