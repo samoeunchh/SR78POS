@@ -139,6 +139,9 @@
                     }
                 }
             });
+            $("#Discount").blur(function () {
+                Calculation();
+            });
         });
         $(document).on("click", ".remove", function () {
             $(this).closest("tr").remove();
@@ -163,7 +166,8 @@
                 total += (amount - disc);
             });
             $("#Total").val(total);
-            $("#GrandTotal").val(total);
+            var discount = (total * Number($("#Discount").val()) / 100);
+            $("#GrandTotal").val(total - discount);
         }
     </script>
 }
