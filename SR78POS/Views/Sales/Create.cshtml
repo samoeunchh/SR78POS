@@ -118,8 +118,11 @@
                             success: function (response) {
                                 console.log(response);
                                 if (response) {
+                                    var unitId = "'" + response.saleUnit + "'";
+                                    var productId = "'" + response.productId + "'";
                                     var row = "<tr><td><input type='hidden' value='" + response.barcode + "' name='barcode[]' />" + response.productName + "</td>";
-                                    row += "<td><select class='form-control' name='unit[]' id='unit" + i + "'>" + options + "</select></td>";
+                                    row += '<td><select class="form-control" name="unit[]" id="unit' + i
+                                        + '" onChange="UnitChange(' + productId +',' + i +');">' + options + '</select></td>';
                                     row += "<td>" + response.price + "</td>";
                                     row += "<td><input type='number' class='form-control qty' name='qty[]' value='1'/></td>";
                                     row += "<td>" + response.price + "</td>";
@@ -153,6 +156,20 @@
         $(document).on("blur", ".discount", function () {
             Calculation();
         });
+        function UnitChange(pid, i) {
+            var uid = document.getElementsByName("unit[]")[i].value;
+            $.ajax({
+                method: "GET",
+                url: "/Sales/GetPriceByUnit/?pid=" + pid + "&uid=" + uid,
+                dataType: "Json",
+                success: function (response) {
+                    $("#t1 > tbody  > tr:eq(" + i + ")").find("td:eq(2)").html(response.price);
+                    Calculation();
+                }, error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
         function Calculation() {
             var total = 0;
             $("#t1 > tbody  > tr").each(function (i) {

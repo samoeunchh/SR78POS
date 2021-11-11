@@ -157,5 +157,8 @@ namespace SR78POS.Controllers
         {
             return _context.Sale.Any(e => e.SaleId == id);
         }
+        public async Task<JsonResult> GetPriceByUnit(Guid pid, Guid uid)
+            => Json(await _context.ProductPrice.FirstOrDefaultAsync(x => x.ProductId.Equals(pid) &&
+            x.UnitId.Equals(uid)));
     }
 }
