@@ -53,15 +53,31 @@ namespace SR78POS.Controllers
         }
 
         // POST: Sales/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SaleId,CustomerId,IssueDate,InvoiceNumber,Total,Discount,GrandTotal")] Sale sale)
+        public async Task<IActionResult> Create(Sale sale)
         {
             if (ModelState.IsValid)
             {
-                sale.SaleId = Guid.NewGuid();
+                var id = Guid.NewGuid();
+                sale.SaleId = id;
+                sale.InvoiceNumber = InvoiceNumber();
+                if(sale.SaleDetails != null)
+                {
+                    for(int i = 0; i < sale.SaleDetails.Count; i++)
+                    {
+                        sale.SaleDetails[i].SaleId = id;
+                        sale.SaleDetails[i].SaleDetailId = Guid.NewGuid();
+                        var detail = sale.SaleDetails[i];
+                        // find Unit Qty
+                        var uQty = _context.Unit.Where(x => x.UnitId.Equals(detail.UnitId))
+                            .Select(x => x.Qty).FirstOrDefault();
+                        // Stock reduce
+                        var product = _context.Product.Where(x => x.ProductId.Equals(detail.ProductId)).FirstOrDefault();
+                        _context.Product.Attach(product);
+                        product.OnHand -= uQty * detail.Qty;
+                    }
+                }
                 _context.Add(sale);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -69,7 +85,8 @@ namespace SR78POS.Controllers
             ViewData["CustomerId"] = new SelectList(_context.Customer, "CustomerId", "CustomerName", sale.CustomerId);
             return View(sale);
         }
-
+        private string InvoiceNumber()
+            => DateTime.Now.ToString("yyMMddHHmmss");
         // GET: Sales/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
